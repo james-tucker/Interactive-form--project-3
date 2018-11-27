@@ -1,14 +1,13 @@
 /**
- * The form's javascript file.
+ * Interactive forms Javascript
  * 
- * The rest is the interaction for the form. 
  */
 
 
 (function() {
     "use strict";
 
-    // implementation of requirement (R2) "Job Role Other"
+    // Function to create Job Role(s)
     function EnableJobRoleInteraction() {
         const $yourJobRoleInput = $("#your-job-role");
         const $jobTitleSelect = $("#title");
@@ -17,17 +16,17 @@
             $yourJobRoleInput.toggle($jobTitleSelect.val() === "other");
         }
 
-        // Connect & Initialize interaction
+        // Connections and Intiiliaizes the interaction
         $jobTitleSelect.on("change", ShowOrHideYourJobRoleDependingOnSelection);
         ShowOrHideYourJobRoleDependingOnSelection();
     }
 
-    // implementation of requirement (R3+R4) "Dropboxes and placeholders"
+    // Adding dropboxes & placeholcer(s)
     function EnableTShirtDesignsAndColorsInteraction() {
         const $designSelect = $("#design");
         const $colorSelect  = $("#color");
 
-        // Add a placeholder option
+        // Placeholder option
         const $placeholderOption = $('<option>Please select a T-shirt theme</option>');
         $colorSelect.prepend($placeholderOption);
 
@@ -42,19 +41,15 @@
 
             $placeholderOption.toggle(design === "Select Theme");
 
-            /* We always select the first visible option when the theme is changed.
-               As far as we know there should always be at least one.
-             */
             $colorSelect.val($colorSelect.find("option:visible")[0].value);
         }
 
-        // Connect & initialize interaction
+        // Connects & Initializes the interaction
         $designSelect.on("change", () => { MakeColorsVisibleByDesign($designSelect.val()); });
         MakeColorsVisibleByDesign($designSelect.val());
     }
 
-    // implementation of requirement (R11) "Dropboxes and placeholders"
-    // For exceeding expectations we need to do some things differently.
+    // Using the dropboxes and placeholder(s)
     function EnableTShirtDesignsAndColorsInteraction_ExceedingExpectations() {
         const $designSelect = $("#design");
         const $colorSelect  = $("#color");
@@ -87,18 +82,16 @@
             }
         }
 
-        // Connect & initialize interaction
         $designSelect.on("change", () => { MakeColorsVisibleByDesign($designSelect.val()); });
         MakeColorsVisibleByDesign($designSelect.val());
     }
 
-
-    // implementation of requirement (R5) "Activities and timeslots"
+    // Activities and Timeslots
     function EnableActivitySelectionAndTimeslots() {
         const $activityFieldset = $(".activities");
         const $activityCheckboxes = $('.activities input[type="checkbox"]');
 
-        // Collects information about all the used timeslots.
+        // Grabs info about the timeslots
         function UsedTimeslots() {
             let result = [];
 
@@ -116,7 +109,6 @@
         }        
 
         function DisableActivitiesOnTimeslotsThatAreNotChecked(event) {
-            // We want this handler to just run once every checkbox click/change.
             if ( event !== undefined ) event.stopPropagation();
 
             let usedTimeslots = UsedTimeslots();
@@ -139,12 +131,12 @@
         DisableActivitiesOnTimeslotsThatAreNotChecked();
     }
 
-    // implementation of requirement (R6) "Activities and their costs"
+    // Functions for activities and their costs
     function EnableActivityCostCalculation() {
         const $activityFieldset = $(".activities");
         const $activityCheckboxes = $('.activities input[type="checkbox"]');
 
-        // total cost html "control"
+        // Total cost
         const $totalCostControl = $(`
         <div class="totalCost">
             <span class="totalCost__label">Total:</span>
@@ -177,7 +169,7 @@
         UpdateTotalCost();
     }
 
-    // implementation of requirement (R7) "Show and hide payment sections"
+    // Payment sections (showing and hiding)
     function EnablePaymentSectionDisplay() {
         const $paymentSelect = $("#payment");
         const options = $paymentSelect.children();
@@ -201,25 +193,19 @@
         ShowSelectedPaymentSection();
     }
 
-    // implementation of requirement (R8) "Form Validation"
+    // Form Validation(s)
     function EnableFormValidation() {
         const $form = $("form");
-        // all validation rules that shall be applied
+        // All rules applied
         const rules = [];
-        // all validation controls, the controls showing the error messages
+        // Controls show the error messages
         const validationControls = [];
-        // all selectors for controls that shall be validated
+        // All selectorts for controls being validated
         const validatedControlSelectors = [];
 
-        /* When used with javascript we modify the form to not do 
-           HTML 5 validation so we can meet the requirements. 
-           Still, when Js is disabled, why not use it? */
         $form.attr("novalidate", "novalidate");
 
-        /* OnlyDigits verifies that there are only numerical
-           characters within the text passed in. We need that 
-           for the validation of the credit card.
-        */
+        //OnlyDigits verifies that only numerical characters are used for the CC Info.
         function OnlyDigits(text) {
             var validCharacters = "1234567890";
 
@@ -256,8 +242,7 @@
         }
 
         function ShowValidationMessage(forSelector, message) {
-            // We convert our messages to HTML, encode them, 
-            // then we can savely replace line feeds with <br>'s.
+           
             let messageHtml = $('<div/>').text(message).html().replace(/\n/g, "<br/>");
 
             for (let i = 0; i < validationControls.length; i++) {
@@ -329,7 +314,7 @@
 
             for (let i = 0; i < validatedControlSelectors.length; i++) {
                 if ( validatedControlSelectors[i] === ".activities" ) continue;
-                if ( validatedControlSelectors[i] === ".credit-card-row1" ) continue; // its a virtual selector
+                if ( validatedControlSelectors[i] === ".credit-card-row1" ) continue; 
 
                 AttachValidation(validatedControlSelectors[i], validatedControlSelectors[i]);
             }
@@ -343,16 +328,16 @@
         AppendValidationControlFor("#email");
         RegisterValidationControlFor(".activities", "#registerActivitiesValidationControl");
 
-        // .credit-card-row1 is virtual, just an identifier
+        //Row1 is virtual, just indentifier
         RegisterValidationControlFor(".credit-card-row1", "#cardnumber-zipcode-cvv-validation");
         AppendValidationControlFor("#payment");
 
-        // R8.1 Name field isn’t blank
+        // Name field cannot be blank
         rules.push(() => {
             if ( $("#name").val() === "" ) { return { for: "#name", message: "The name field shoudn't be blank." }; }
             return {};
         });
-        // R8.2 Email-field isn't blank
+        // Email field cannot be blank
         rules.push(() => {
             if ( $("#email").val() === "" ) {
                 return { for: "#email", message: "The e-mail field is required. Please enter your email address." };
@@ -364,14 +349,14 @@
             }
             return {};
         });
-        // R8.3 there should be an activity that is checked; at least one
+        // Choose an activity you lazy bum!  That is what I should have said as an error message here (Activity required)
         rules.push(() => {
             if ( $(".activities input:checked").length == 0 ) {
                 return { for: ".activities", message: "There should be at least one activity that is selected." };
             } 
             return {};
         });
-        // R8.4 If "Credit Card" is the selected payment option, the three fields accept only numbers: a 13 to 16-digit credit card number, a 5-digit zip code, and 3-number CVV value
+        // If CC is selected as a payment option, each required field contains its own validation for characters/ranges
         rules.push(() => {
             let message = ""; 
 
@@ -407,9 +392,6 @@
                 return { for: ".credit-card-row1", message: message.trim() };
             }
 
-            // Todo: We should split the error message when the screen is very small and
-            // the layout gets rearranged. It works this way, its ok, but it would be better still.
-
             return {};
         });
 
@@ -421,18 +403,17 @@
         });
 
 
-        // When the form is submitted, then we first want to check if all rules apply.
+        // After form is first submitted, checking that all rules apply
         $form.on("submit", (event) => {
             if (!IsFormValid()) {
                 event.preventDefault();
             }
         });
-        // Instant validation = on
+
         AttachInstantValidationToDom();
     }
 
     EnableJobRoleInteraction();
-    // EnableTShirtDesignsAndColorsInteraction();
     EnableTShirtDesignsAndColorsInteraction_ExceedingExpectations();
     EnableActivitySelectionAndTimeslots();
     EnableActivityCostCalculation();
